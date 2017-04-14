@@ -5,7 +5,7 @@
     "main": "index.js",
     "preferGlobal": true,
     "bin": {
-        "csv2table": "./index.js"
+        "csv-to-table": "./index.js"
     },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
