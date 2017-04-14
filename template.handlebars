@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    <link type="text/css" rel="stylesheet" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css">
+    <link type="text/css" rel="stylesheet" href="https://cdn.datatables.net/buttons/1.2.4/css/buttons.dataTables.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.2.4/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.2.4/js/buttons.colVis.min.js"></script>
+    <style>
+
+
+    </style>
+</head>
+
+<body>
+    <table id="dataTable" class="display" style="width:100%"></table>
+    <script>
+        //built from the example here https://datatables.net/reference/option/columns.data
+        //built from the example here https://datatables.net/examples/data_sources/js_array.html
+        
+        var tableData = {{{tableJSON}}};
+        
+        var columns = {{{columnsJSON}}};
+
+        columns = columns.map(function(col) {
+            return {
+                data: col,
+                title: col
+            };
+        });
+
+
+        $(document).ready(function() {
+            $('#dataTable').DataTable({
+                paging: false,
+                data: tableData,
+                columns: columns
+            });
+        });
+
+    </script>
+</body>
+
+</html>

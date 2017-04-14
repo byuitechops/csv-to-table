@@ -1,0 +1,19 @@
+{
+    "name": "csv-to-table",
+    "version": "1.0.0",
+    "description": "reads in a csv and makes an html file with a table from the csv data",
+    "main": "index.js",
+    "preferGlobal": true,
+    "bin": {
+        "csv2table": "./index.js"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Joshua McKinney",
+    "license": "MIT",
+    "dependencies": {
+        "d3-dsv": "^1.0.5",
+        "handlebars": "^4.0.6"
+    }
+}
