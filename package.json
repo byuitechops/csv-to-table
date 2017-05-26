@@ -10,8 +10,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Joshua McKinney",
-  "license": "MIT",
   "dependencies": {
     "d3-dsv": "^1.0.5",
     "handlebars": "^4.0.6",
@@ -25,5 +23,7 @@
   "bugs": {
     "url": "https://github.com/byuitechops/csv-to-table/issues"
   },
-  "homepage": "https://github.com/byuitechops/csv-to-table#readme"
+  "homepage": "https://github.com/byuitechops/csv-to-table#readme",
+  "author": "Joshua McKinney",
+  "license": "MIT"
 }
