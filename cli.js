@@ -5,7 +5,7 @@
 var title,
     fs = require('fs'),
     path = require('path'),
-    makeReport = require('./index.js');
+    csvToTable = require('./index.js');
 
 function readFile(name) {
     var file = fs.readFileSync(name, 'utf8');
@@ -53,4 +53,4 @@ var argv = require('yargs')
 
 //get the title of the report
 title = path.parse(argv.fileName).name;
-makeReport.fromCSVString(argv.fileContents, argv.l, argv.b, title)
+csvToTable.fromCSVString(argv.fileContents, argv.l, argv.b, title)
