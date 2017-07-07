@@ -55,15 +55,8 @@ function makeReportFromCSVString(csvString, noLinks, noBrowser, title) {
         csvString += '\n';
     }
 
-    // to allow users to sort back to the original order, add a index column as the first column
-    // add index data
-    csvData = dsv.csvParse(csvString, function (d, i) {
-        d.index = i;
-        return d;
-    });
-    // add column name
-    csvData.columns.unshift('index');
-
+    csvData = dsv.csvParse(csvString);
+    
     makeReportFromArray(csvData, csvData.columns, noLinks, noBrowser, title)
 }
 
