@@ -28,7 +28,7 @@
     <div id='top'>
     <h2>{{title}}</h2>
     <p>To sort by more than one column at a time, hold down shift when you click the sort buttons.</p>
-    <button onclick="">Download CSV File</button>
+    <button>Download CSV File</button>
     <h3>Toggle Columns</h3>
     </div>
     <table id="dataTable" class="table table-striped table-bordered"    ></table>
@@ -42,6 +42,8 @@
         
         var columns = {{{columnsJSON}}};
         
+        var columnsForDatatable;
+        
         // to allow users to sort back to the original order, add a index column as the first column
         //add in the index column
         tableData = tableData.map(function(data, i){
@@ -49,9 +51,9 @@
             return data;
         });
         columns.unshift('index');
-
+        
         //format the columns for the datatable libaray
-        columns = columns.map(function(col) {
+        columnsForDatatable = columns.map(function(col) {
             return {
                 data: col,
                 title: col
@@ -59,10 +61,11 @@
         });
         
         function downloadCSV(){
-            download(d3.csv.format(tableData, columns), '{{title}}.csv', 'text/csv');
+            download(d3.csvFormat(tableData, columns), '{{title}}.csv', 'text/csv');
         }
 
         $(document).ready(function() {
+            //set up the table
             $('#dataTable').DataTable({
                 searching: false,   
                 paging: false,
@@ -73,6 +76,9 @@
                     'columnsToggle'
                 ]
             });
+            
+            //add the onclick for the button
+            $('button').click(downloadCSV);
         });
 
     </script>
