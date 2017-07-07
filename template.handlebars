@@ -41,7 +41,8 @@
         var tableData = {{{tableJSON}}};
         
         var columns = {{{columnsJSON}}};
-
+        
+        // to allow users to sort back to the original order, add a index column as the first column
         //add in the index column
         tableData = tableData.map(function(data, i){
             data.index = i + 1;
