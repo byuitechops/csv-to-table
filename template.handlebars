@@ -42,6 +42,13 @@
         
         var columns = {{{columnsJSON}}};
 
+        //add in the index column
+        tableData = tableData.map(function(data, i){
+            data.index = i + 1;
+            return data;
+        });
+        columns.unshift('index');
+
         //format the columns for the datatable libaray
         columns = columns.map(function(col) {
             return {
