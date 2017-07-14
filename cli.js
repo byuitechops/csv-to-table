@@ -7,6 +7,7 @@ var title,
     path = require('path'),
     csvToTable = require('./index.js');
 
+// reads and returns the name of the csv data and catches if is empty
 function readFile(name) {
     var file = fs.readFileSync(name, 'utf8');
 
@@ -18,7 +19,7 @@ function readFile(name) {
 
 }
 
-// this is if the user just wants to see the help options
+// these are the optional "options" the user can input in the cli 
 var argv = require('yargs')
     .options({
         'no-browser': {
@@ -40,7 +41,9 @@ var argv = require('yargs')
         //check if file ending is a csv
         if (path.extname(argv.fileName) !== '.csv') {
             throw new Error("The file name you supplied is not a '.csv'")
-        } else {
+        }
+        // if the file turns out to be csv, it is sent to have the contents read
+        else {
             argv.fileContents = readFile(argv.fileName);
         }
         return true;
@@ -51,6 +54,7 @@ var argv = require('yargs')
 /************************  Start *************************/
 
 
-//get the title of the report
+// get the title of the report
 title = path.parse(argv.fileName).name;
+// create html page showing data from csv
 csvToTable.fromCSVString(argv.fileContents, argv.l, argv.b, title)

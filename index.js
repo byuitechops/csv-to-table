@@ -8,6 +8,8 @@ var dsv = require('d3-dsv'),
     templateFileName = 'template.handlebars',
     htmlString;
 
+/* writes out table of the csv data into an html page and 
+opens in the browser (if user didn't use "no browser" option) */
 function writeAndOpenHtmlFile(htmlString, htmlFileName, noBrowser) {
     try {
         fs.writeFileSync(htmlFileName, htmlString, 'utf8')
@@ -20,6 +22,7 @@ function writeAndOpenHtmlFile(htmlString, htmlFileName, noBrowser) {
     }
 }
 
+// finds and retruns the name of the file
 function readFile(name) {
     var file = '';
     file = fs.readFileSync(name, 'utf8');
@@ -27,11 +30,14 @@ function readFile(name) {
 
 }
 
+// combines paths into one string and returns its name
 function getTemplate() {
     var fileName = path.join(__dirname, templateFileName)
     return readFile(fileName);
 }
 
+
+// compiles and runs the template
 function runTemplate(csvData, columns, title) {
     //compile the template
     var template = Handlebars.compile(getTemplate());
@@ -46,7 +52,7 @@ function runTemplate(csvData, columns, title) {
 }
 
 
-
+// this takes the raw data and puts it all together into a nice layout (I think)
 function makeReportFromCSVString(csvString, noLinks, noBrowser, title) {
     var csvData;
 
@@ -55,18 +61,12 @@ function makeReportFromCSVString(csvString, noLinks, noBrowser, title) {
         csvString += '\n';
     }
 
-    // to allow users to sort back to the original order, add a index column as the first column
-    // add index data
-    csvData = dsv.csvParse(csvString, function (d, i) {
-        d.index = i;
-        return d;
-    });
-    // add column name
-    csvData.columns.unshift('index');
+    csvData = dsv.csvParse(csvString);
 
     makeReportFromArray(csvData, csvData.columns, noLinks, noBrowser, title)
 }
 
+// makes csv data, mainly the urls, more responsive 
 function makeReportFromArray(csvData, columnsArray, noLinks, noBrowser, title) {
     //d3-dsv adds a bunch of properties to the data array when it parses a string, this map rips them off
     csvData = csvData.map(function (row) {
@@ -75,7 +75,7 @@ function makeReportFromArray(csvData, columnsArray, noLinks, noBrowser, title) {
             for (var key in row) {
                 if (typeof row[key] === "string") {
                     // the code for first parameter was taken from regexr.com
-                    row[key] = row[key].replace(/(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g, "<a href='$&' target='_blank'>$&</a>")
+                    row[key] = row[key].replace(/(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]* )/g, "<a href='$&' target='_blank'>$&</a>")
                 }
             }
         }
