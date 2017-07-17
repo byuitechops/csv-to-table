@@ -63,19 +63,31 @@ function makeReportFromCSVString(csvString, noLinks, noBrowser, title) {
 
     csvData = dsv.csvParse(csvString);
 
-    makeReportFromArray(csvData, csvData.columns, noLinks, noBrowser, title)
+
+    makeReportFromArray(csvData, csvData.columns, noLinks, noBrowser, title);
 }
 
 // makes csv data, mainly the urls, more responsive 
 function makeReportFromArray(csvData, columnsArray, noLinks, noBrowser, title) {
     //d3-dsv adds a bunch of properties to the data array when it parses a string, this map rips them off
     csvData = csvData.map(function (row) {
+
         // This loop goes through each cell and replace urls in strings with a clickable URL via <a> tag
-        if (!noLinks) {
-            for (var key in row) {
+        for (var key in row) {
+            /* checks to see if url is related to byui content in the url, and if not it 
+            removes any spaces in the url (because a regular site would not have any) */
+            if (row[key].includes(" ") && (!(row[key].includes('brightspace')) || !(row[key].includes('byui')))) {
+                row[key] = row[key].replace(" ", "");
+            }
+
+            // if the user didn't indicate that he doesn't want clickable links
+            if (!noLinks) {
+
+                /* looks for any signs of being a url, and if so 
+                it wraps it in an <a> tag, making it clickable */
                 if (typeof row[key] === "string") {
                     // the code for first parameter was taken from regexr.com
-                    row[key] = row[key].replace(/(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]* )/g, "<a href='$&' target='_blank'>$&</a>")
+                    row[key] = row[key].replace(/(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&// =]*)/g, "<a href='$&' target='_blank'>$&</a>")
                 }
             }
         }
