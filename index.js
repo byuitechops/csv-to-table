@@ -69,7 +69,13 @@ function makeReportFromCSVString(csvString, noLinks, noBrowser, title) {
 
 function getReplacement(url) {
 
-    var newHref = url.replace(/(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//= ]*)/g, "<a href='$&' target='_blank'>$&</a>")
+    var newHref = url.replace(/(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//= ]*)/g, function (match) {
+        //for urls in brightspace that have spaces in them, but avoids putting %20 in an HTML tag
+        if (match.includes('brightspace')) {
+            match = match.replace(" ", "%20");
+        }
+        return '<a href="' + match + '" target="_blank">' + match + '</a>';
+    })
     return newHref;
 }
 
@@ -80,23 +86,11 @@ function makeReportFromArray(csvData, columnsArray, noLinks, noBrowser, title) {
 
         // This loop goes through each cell and replace urls in strings with a clickable URL via <a> tag
         for (var key in row) {
-
-
-
             // if the user didn't indicate that he doesn't want clickable links
             if (!noLinks) {
-
-
-
                 /* looks for any signs of being a url, and if so 
                 it wraps it in an <a> tag, making it clickable */
                 if (typeof row[key] === "string") {
-
-                    /* checks to see if url is related to byui content in the url, and if not it 
-                        removes any spaces in the url (because a regular site would not have any) */
-                    if (row[key].includes(" ") && row[key].includes('brightspace')) {
-                        row[key] = row[key].replace(" ", "%20");
-                    }
                     // the code for first parameter was taken from regexr.com
                     row[key] = getReplacement(row[key])
                 }
