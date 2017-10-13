@@ -5,8 +5,7 @@ var dsv = require('d3-dsv'),
     fs = require('fs'),
     path = require('path'),
     open = require('open'),
-    templateFileName = 'template.handlebars',
-    htmlString;
+    templateFileName = 'template.handlebars';
 
 /* writes out table of the csv data into an html page and 
 opens in the browser (if user didn't use "no browser" option) */
@@ -43,10 +42,10 @@ function runTemplate(csvData, columns, title) {
     var template = Handlebars.compile(getTemplate());
 
     //run the template
-    htmlString = template({
+    return template({
         title: title,
-        columnsJSON: JSON.stringify(columns),
-        tableJSON: JSON.stringify(csvData)
+        columnsJSON: JSON.stringify(columns, null, 4),
+        tableJSON: JSON.stringify(csvData, null, 4)
     });
 
 }
@@ -54,53 +53,72 @@ function runTemplate(csvData, columns, title) {
 
 // this takes the raw data and puts it all together into a nice layout (I think)
 function makeReportFromCSVString(csvString, noLinks, noBrowser, title) {
-    var csvData;
+    var csvData,
+        columns;
 
     // d3-dsv expects the csv string to end with a new line, add a \n if needed
     if (csvString[csvString.length - 2] !== '\n') {
         csvString += '\n';
     }
 
+    //make an array
     csvData = dsv.csvParse(csvString);
+    //save the columns before we delete them
+    columns = csvData.columns;
+
+    //d3-dsv adds a bunch of properties to the data array when it parses a string, this map rips them off
+    csvData = csvData.map(function (data) {
+        return data;
+    })
 
 
-    makeReportFromArray(csvData, csvData.columns, noLinks, noBrowser, title);
+    makeReportFromArray(csvData, columns, noLinks, noBrowser, title);
 }
 
-function getReplacement(url) {
-
-    var newHref = url.replace(/(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//= ]*)/g, function (match) {
-        //for urls in brightspace that have spaces in them, but avoids putting %20 in an HTML tag
-        if (match.includes('brightspace')) {
-            match = match.replace(" ", "%20");
-        }
-        return '<a href="' + match + '" target="_blank">' + match + '</a>';
-    })
-    return newHref;
+function makeUrlsClickable(url) {
+    // the linkRegEx was taken from regexr.com
+    var linkRegEx = /(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//= ]*)/g;
+    return url.replace(linkRegEx, '<a href="$&" target="_blank" >$&</a>');
 }
 
 // makes csv data, mainly the urls, more responsive 
 function makeReportFromArray(csvData, columnsArray, noLinks, noBrowser, title) {
-    //d3-dsv adds a bunch of properties to the data array when it parses a string, this map rips them off
+    var htmlString;
+
+    //make everything a string!
+    //if this is comming from makeReportFromCSVString they all ready are strings but oh well
+
+    //need to make a copy of the obj so that we have our own objs not refs to the objs in the csvdata passed in
+    //this is because we are about to make changes to them
     csvData = csvData.map(function (row) {
-
-        // This loop goes through each cell and replace urls in strings with a clickable URL via <a> tag
-        for (var key in row) {
-            // if the user didn't indicate that he doesn't want clickable links
-            if (!noLinks) {
-                /* looks for any signs of being a url, and if so 
-                it wraps it in an <a> tag, making it clickable */
-                if (typeof row[key] === "string") {
-                    // the code for first parameter was taken from regexr.com
-                    row[key] = getReplacement(row[key])
-                }
-            }
+        var objOut = {};
+        for (key in row) {
+            objOut[key] = row[key].toString();
         }
-        return row;
-    })
+        return objOut;
+    });
 
+    // This loop goes through each cell and replace urls in strings with a clickable URL via <a> tag
+    if (!noLinks) {
+        csvData = csvData.map(function (row) {
+            var keys = Object.keys(row);
 
-    runTemplate(csvData, columnsArray, title);
+            keys.forEach(function (key) {
+                row[key] = makeUrlsClickable(row[key]);
+            })
+
+            return row;
+        });
+    }
+
+    /*    for (i = 0; i < 3; i++) {
+            console.log(csvData[i]);
+        }*/
+
+    //make the html page
+    htmlString = runTemplate(csvData, columnsArray, title);
+
+    //write the html file and open in browser
     writeAndOpenHtmlFile(htmlString, title + '.html', noBrowser);
 
 }
