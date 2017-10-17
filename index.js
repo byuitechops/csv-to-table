@@ -37,7 +37,7 @@ function getTemplate() {
 
 
 // compiles and runs the template
-function runTemplate(csvData, columns, title) {
+function runTemplate(csvData, columns, title, makeLinksClickable) {
     //compile the template
     var template = Handlebars.compile(getTemplate());
 
@@ -45,7 +45,8 @@ function runTemplate(csvData, columns, title) {
     return template({
         title: title,
         columnsJSON: JSON.stringify(columns, null, 4),
-        tableJSON: JSON.stringify(csvData, null, 4)
+        tableJSON: JSON.stringify(csvData, null, 4),
+        makeLinksClickableText : makeLinksClickable ? "true": "false"
     });
 
 }
@@ -75,48 +76,14 @@ function makeReportFromCSVString(csvString, noLinks, noBrowser, title) {
     makeReportFromArray(csvData, columns, noLinks, noBrowser, title);
 }
 
-function makeUrlsClickable(url) {
-    // the linkRegEx was taken from regexr.com
-    var linkRegEx = /(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//= ]*)/g;
-    return url.replace(linkRegEx, '<a href="$&" target="_blank" >$&</a>');
-}
 
 // makes csv data, mainly the urls, more responsive 
 function makeReportFromArray(csvData, columnsArray, noLinks, noBrowser, title) {
-    var htmlString;
-
-    //make everything a string!
-    //if this is comming from makeReportFromCSVString they all ready are strings but oh well
-
-    //need to make a copy of the obj so that we have our own objs not refs to the objs in the csvdata passed in
-    //this is because we are about to make changes to them
-    csvData = csvData.map(function (row) {
-        var objOut = {};
-        for (key in row) {
-            objOut[key] = row[key].toString();
-        }
-        return objOut;
-    });
-
-    // This loop goes through each cell and replace urls in strings with a clickable URL via <a> tag
-    if (!noLinks) {
-        csvData = csvData.map(function (row) {
-            var keys = Object.keys(row);
-
-            keys.forEach(function (key) {
-                row[key] = makeUrlsClickable(row[key]);
-            })
-
-            return row;
-        });
-    }
-
-    /*    for (i = 0; i < 3; i++) {
-            console.log(csvData[i]);
-        }*/
+    var htmlString,
+        makeLinksClickable = !noLinks;
 
     //make the html page
-    htmlString = runTemplate(csvData, columnsArray, title);
+    htmlString = runTemplate(csvData, columnsArray, title, makeLinksClickable);
 
     //write the html file and open in browser
     writeAndOpenHtmlFile(htmlString, title + '.html', noBrowser);
